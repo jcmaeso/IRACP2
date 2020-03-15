@@ -8,16 +8,16 @@ window.onbeforeunload = function(e){
 
 // Data channel information
 var sendChannel, receiveChannel;
-var sendButton = document.getElementById("sendButton");
-var sendTextarea = document.getElementById("dataChannelSend");
-var receiveTextarea = document.getElementById("dataChannelReceive");
+//var sendButton = document.getElementById("sendButton");
+//var sendTextarea = document.getElementById("dataChannelSend");
+//var receiveTextarea = document.getElementById("dataChannelReceive");
 
 // HTML5 <video> elements
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 
 // Handler associated with 'Send' button
-sendButton.onclick = sendData;
+//sendButton.onclick = sendData;
 
 // Flags...
 var isChannelReady = false;
@@ -241,12 +241,14 @@ function createPeerConnection() {
 }
 
 // Data channel management
+//LegacyFunction
+/*
 function sendData() {
   var data = sendTextarea.value;
   if(isInitiator) sendChannel.send(data);
   else receiveChannel.send(data);
   trace('Sent data: ' + data);
-}
+}*/
 
 function sendDataNewChat(data) {
   if(isInitiator) sendChannel.send(data);
@@ -267,7 +269,7 @@ function gotReceiveChannel(event) {
 function handleMessage(event) {
   trace('Received message: ' + event.data);
   processRcvMessage(event.data);
-  receiveTextarea.value += event.data + '\n';
+  //receiveTextarea.value += event.data + '\n';
 }
 
 function handleSendChannelStateChange() {

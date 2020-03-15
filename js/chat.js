@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
  }, false);
  
 
-
+//Test fucntion nothing that really matters
 let testContentAdd = () =>{
     if(counter%2 == 0){
         postSentMessage({data: "cosis"});
