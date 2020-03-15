@@ -1,0 +1,20 @@
+{
+  "name": "IRACP2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "completeNodeServerWithDataChannel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcmaeso/IRACP2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcmaeso/IRACP2/issues"
+  },
+  "homepage": "https://github.com/jcmaeso/IRACP2#readme"
+}
