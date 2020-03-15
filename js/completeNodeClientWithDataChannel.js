@@ -248,6 +248,12 @@ function sendData() {
   trace('Sent data: ' + data);
 }
 
+function sendDataNewChat(data) {
+  if(isInitiator) sendChannel.send(data);
+  else receiveChannel.send(data);
+  trace('Sent data by new Chat: ' + data);
+}
+
 // Handlers...
 
 function gotReceiveChannel(event) {
@@ -260,6 +266,7 @@ function gotReceiveChannel(event) {
 
 function handleMessage(event) {
   trace('Received message: ' + event.data);
+  processRcvMessage(event.data);
   receiveTextarea.value += event.data + '\n';
 }
 
