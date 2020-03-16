@@ -10,6 +10,14 @@
     "type": "git",
     "url": "git+https://github.com/jcmaeso/IRACP2.git"
   },
+  "dependencies": {
+    "another_dep": "~2.2.0",
+    "bufferutil": "^4.0.1",
+    "my_dep": "^1.0.0",
+    "node-static": "^0.7.11",
+    "socket.io": "^2.3.0",
+    "utf-8-validate": "^5.0.2"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
