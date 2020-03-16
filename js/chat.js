@@ -34,6 +34,7 @@ var counter = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("btn-chat").onclick = sendMessageFromChat;
+    document.getElementById("btn-input").onkeypress = enterSendMessage;
  }, false);
  
 
@@ -45,6 +46,12 @@ let testContentAdd = () =>{
         postRcvMessage({data:"masCosis"});
     }
     counter++;
+}
+
+let enterSendMessage = e =>{
+    if(e.keyCode === 13){
+        sendMessageFromChat();
+    }
 }
 
 let sendMessageFromChat = () => {
