@@ -62,18 +62,19 @@ let processRcvMessage = message =>{
 }
 
 let postRcvMessage = message => {
-    let html = composeHTML(message,RcvMessageTemplate);
+    let html = composeHTML(message,RcvMessageTemplate,remoteName);
     addMessage(html);
 };
 
 let postSentMessage = message =>{
-    let html = composeHTML(message,SentMessageTemplate);
+    let html = composeHTML(message,SentMessageTemplate,localName);
     addMessage(html);
 };
 
-let composeHTML = (message,html) => {
+let composeHTML = (message,html,name) => {
     let filledHTML = html.replace("{{MessageContent}}",message.data);
     filledHTML = filledHTML.replace("{{MessageTime}}",getFormattedDate());
+    filledHTML = filledHTML.replace("{{MessageFrom}}",name);
     return filledHTML;
 };
 

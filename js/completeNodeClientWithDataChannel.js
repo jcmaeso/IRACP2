@@ -16,6 +16,10 @@ var sendChannel, receiveChannel;
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 
+//Chat Names
+let localName;
+let remoteName;
+
 // Handler associated with 'Send' button
 //sendButton.onclick = sendData;
 
@@ -30,6 +34,9 @@ var localStream;
 var remoteStream;
 // Peer Connection
 var pc;
+
+let receiveBuffer = new Uint8Array(0);
+
 
 /*
 var webrtcDetectedBrowser = null;
@@ -76,6 +83,7 @@ function trace(text) {
 
 /////////////////////////////////////////////
 // Let's get started: prompt user for input (room name)
+localName = prompt('Enter your name:');
 var room = prompt('Enter room name:');
 
 var urlServer = location.origin;
@@ -86,7 +94,7 @@ var socket = io.connect(urlServer);
 // Send 'Create or join' message to singnalling server
 if (room !== '') {
   console.log('Create or join room', room);
-  socket.emit('create or join', room);
+  socket.emit('create or join', {room: room,localName: localName});
 }
 
 // Set getUserMedia constraints
@@ -135,17 +143,20 @@ socket.on('full', function (room){
 // Handle 'join' message coming back from server:
 // another peer is joining the channel
 socket.on('join', function (room){
-  console.log('Another peer made a request to join room ' + room);
-  console.log('This peer is the initiator of room ' + room + '!');
+  console.log('Another peer made a request to join room' + room.room);
+  console.log('This peer is the initiator of room' + room.room + '!');
+  remoteName = room.remoteName;
+  console.log("RemoteName is: "+remoteName);
   isChannelReady = true;
 });
 
 // Handle 'joined' message coming back from server:
 // this is the second peer joining the channel
 socket.on('joined', function (room){
-  console.log('This peer has joined room ' + room);
+  console.log('This peer has joined room ' + room.room);
   isChannelReady = true;
-
+  remoteName = room.remoteName;
+  console.log("RemoteName is: "+remoteName);
   // Call getUserMedia()
   navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
   console.log('Getting user media with constraints', constraints);
@@ -227,6 +238,7 @@ function createPeerConnection() {
       // Create a reliable data channel
       sendChannel = pc.createDataChannel("sendDataChannel",
         {reliable: true});
+        sendChannel.binaryType = 'arraybuffer';
       trace('Created send data channel');
     } catch (e) {
       alert('Failed to create data channel. ');
@@ -272,11 +284,34 @@ function handleMessage(event) {
   //receiveTextarea.value += event.data + '\n';
 }
 
+concatTypedArrays = (a, b) => { // a, b TypedArray of same type
+  var c = new (a.constructor)(a.length + b.length);
+  c.set(a, 0);
+  c.set(b, a.length);
+  return c;
+}
+
+function handleBin(event){
+  console.log(`Received Message ${event.data.byteLength}`);
+  receiveBuffer.push(event.data);
+  receivedSize += event.data.byteLength;
+
+  receiveBuffer = concatTypedArrays(receiveBuffer,new Uint8Array(event.data))
+
+
+  // we are assuming that our signaling protocol told
+  // about the expected file size (and name, hash, etc).
+  //const file = fileInput.files[0];
+  if (receiveBuffer.length === file.size) {
+    receiveBuffer = new Uint8Array(0);
+  }
+}
+
 function handleSendChannelStateChange() {
   var readyState = sendChannel.readyState;
   trace('Send channel state is: ' + readyState);
   // If channel ready, enable user's input
-  if (readyState == "open") {
+  /*if (readyState == "open") {
     dataChannelSend.disabled = false;
     dataChannelSend.focus();
     dataChannelSend.placeholder = "";
@@ -284,14 +319,14 @@ function handleSendChannelStateChange() {
   } else {
     dataChannelSend.disabled = true;
     sendButton.disabled = true;
-  }
+  }*/
 }
 
 function handleReceiveChannelStateChange() {
   var readyState = receiveChannel.readyState;
   trace('Receive channel state is: ' + readyState);
   // If channel ready, enable user's input
-  if (readyState == "open") {
+  /*if (readyState == "open") {
 	    dataChannelSend.disabled = false;
 	    dataChannelSend.focus();
 	    dataChannelSend.placeholder = "";
@@ -299,7 +334,7 @@ function handleReceiveChannelStateChange() {
 	  } else {
 	    dataChannelSend.disabled = true;
 	    sendButton.disabled = true;
-	  }
+	  }*/
 }
 
 // ICE candidates management
@@ -379,3 +414,25 @@ function stop() {
 }
 
 ///////////////////////////////////////////
+
+
+//Helpers
+
+let JsonToArray = function(json)
+{
+	var str = JSON.stringify(json, null, 0);
+	var ret = new Uint8Array(str.length);
+	for (var i = 0; i < str.length; i++) {
+		ret[i] = str.charCodeAt(i);
+	}
+	return ret
+};
+
+let binArrayToJson = function(binArray)
+{
+	var str = "";
+	for (var i = 0; i < binArray.length; i++) {
+		str += String.fromCharCode(parseInt(binArray[i]));
+	}
+	return JSON.parse(str)
+}

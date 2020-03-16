@@ -5,7 +5,7 @@ var https = require('https');
 // Change directory to path of current JavaScript program
 // var process = require('process');
 // process.chdir(__dirname);
-//descomentar las dos líneas anteriores si no se quiere poner el subdirectorio al final, por ej. https://...:8080/cap5/
+//descomentar las dos lï¿½neas anteriores si no se quiere poner el subdirectorio al final, por ej. https://...:8080/cap5/
 
 // Read key and certificates required for https
 var fs = require('fs');
@@ -19,7 +19,7 @@ var options = {
 // Create a node-static server instance
 var file = new(static.Server)();
 
-// We use the http moduleÕs createServer function and
+// We use the http moduleï¿½s createServer function and
 // rely on our instance of node-static to serve the files
 var app = https.createServer(options, function (req, res) {
   file.serve(req, res);
@@ -33,20 +33,23 @@ io.sockets.on('connection', function (socket){
 
 
   socket.on('create or join', function (room) { // Handle 'create or join' messages
-    var numClients = io.sockets.adapter.rooms[room]?io.sockets.adapter.rooms[room].length:0;
+    var numClients = io.sockets.adapter.rooms[room.room]?io.sockets.adapter.rooms[room.room].length:0;
 
-    console.log('S --> Room ' + room + ' has ' + numClients + ' client(s)');
+    console.log('S --> Room ' + room.room + ' has ' + numClients + ' client(s)');
     console.log('S --> Request to create or join room', room);
-
+    console.log(room);
+    console.log("Adaptaor");
+    console.log(io.sockets.adapter.rooms[room.room])
     if(numClients == 0){ // First client joining...
-      socket.join(room);
-      socket.emit('created', room);
+      socket.join(room.room);
+      socket.emit('created', room.room);
+      io.sockets.adapter.rooms[room.room].localName = room.localName
     } else if (numClients == 1) { // Second client joining...
-      io.sockets.in(room).emit('join', room);
-      socket.join(room);
-      socket.emit('joined', room);
+      io.sockets.in(room.room).emit('join', {room: room.room, remoteName: room.localName});
+      socket.join(room.room);
+      socket.emit('joined', {room: room.room, remoteName: io.sockets.adapter.rooms[room.room].localName});
     } else { // max two clients
-      socket.emit('full', room);
+      socket.emit('full', room.room);
     }
   });
 
